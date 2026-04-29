@@ -29,16 +29,25 @@ func LoadMap(filename string) (*Board, Point, error) {
 
 	var startPos Point
 	// read grid
+	maxNum := -1
 	for i := 0; i < n; i++ {
 		scanner.Scan()
 		line := scanner.Text()
 		board.Grid[i] = []rune(line)
 		for j, char := range board.Grid[i] {
+			// check maxTarget
+			if char >= '0' && char <= '9' {
+				num := int(char - '0')
+				if num > maxNum {
+					maxNum = num
+				}
+			}
 			if char == 'Z' {  // posisi awal
 				startPos = Point{ X: i, Y: j }
 			}
 		}
 	}
+	board.MaxTarget = maxNum
 
 	// read cost for each point
 	for i := 0; i < n; i++ {

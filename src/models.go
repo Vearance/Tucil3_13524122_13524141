@@ -8,6 +8,7 @@ type Board struct {
 	N, M   int
 	Grid   [][]rune
 	Costs  [][]int
+	MaxTarget int
 }
 
 type State struct {

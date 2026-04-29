@@ -25,6 +25,7 @@ func main() {
 	}
 
 	start := time.Now()
+	// TODO: if for algo and heuristic
 	// Solve()
 	elapsed := time.Since(start)
 
