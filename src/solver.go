@@ -1,6 +1,6 @@
 package main
 
-func Move(board *Board, current State, dir string) (State, bool) {
+func Move(board *Board, current *State, dir string) (*State, bool) {
 	dx, dy := 0, 0
 
 	switch dir {
@@ -10,9 +10,13 @@ func Move(board *Board, current State, dir string) (State, bool) {
 		case "R": dy = 1
 	}
 
-	nextState := current
-	nextState.Path += dir
-	nextState.Steps++
+	next := &State{
+		Pos:           current.Pos,
+		TotalCost:     current.TotalCost,
+		CurrentTarget: current.CurrentTarget,
+		Parent:        current,
+		Dir:           dir[0],
+	}
 
 	curX, curY := current.Pos.X, current.Pos.Y
 
@@ -22,33 +26,33 @@ func Move(board *Board, current State, dir string) (State, bool) {
 
 		// Cek batas papan (Game over kalau lewat)
 		if curX < 0 || curX >= board.N || curY < 0 || curY >= board.M {
-			return State{}, false
+			return nil, false
 		}
 
 		tile := board.Grid[curX][curY]
 
 		// Berhenti tepat sebelum batu 'X'
 		if tile == 'X' {
-			nextState.Pos = Point{X: curX - dx, Y: curY - dy}
-			return nextState, true
+			next.Pos = Point{X: curX - dx, Y: curY - dy}
+			return next, true
 		}
 
 		// Kena Lava 'L' = Game Over
 		if tile == 'L' {
-			return State{}, false
+			return nil, false
 		}
 
 		// Hitung cost (Tile awal tidak dihitung, tile jalur & berhenti dihitung)
-		nextState.TotalCost += board.Costs[curX][curY]
+		next.TotalCost += board.Costs[curX][curY]
 
 		// Cek urutan angka 0-9
 		if tile >= '0' && tile <= '9' {
 			num := int(tile - '0')
-			if num == nextState.CurrentTarget {
-				nextState.CurrentTarget++
-			} else if num > nextState.CurrentTarget {
+			if num == next.CurrentTarget {
+				next.CurrentTarget++
+			} else if num > next.CurrentTarget {
 				// Melanggar urutan = Game Over
-				return State{}, false
+				return nil, false
 			}
 		}
 	}

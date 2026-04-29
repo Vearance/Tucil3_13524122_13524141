@@ -1,17 +1,18 @@
 package main
 
 type res struct {
-	Found bool
-	Path  string
-	Cost  int
-	Iter  int
+	Found     bool
+	Path      string
+	Cost      int
+	Iter      int
+	Positions []Point
 }
 
 type key struct {
 	X, Y, T int
 }
 
-func isGoal(s State, b *Board) bool {
+func isGoal(s *State, b *Board) bool {
 	if b.Grid[s.Pos.X][s.Pos.Y] != 'O' {
 		return false
 	}
@@ -21,13 +22,31 @@ func isGoal(s State, b *Board) bool {
 	return s.CurrentTarget > b.MaxTarget
 }
 
+func reconstruct(goal *State) (string, []Point) {
+	n := 0
+	for s := goal; s != nil; s = s.Parent {
+		n++
+	}
+	ps := make([]Point, n)
+	dirs := make([]byte, n-1)
+	i := n - 1
+	for s := goal; s != nil; s = s.Parent {
+		ps[i] = s.Pos
+		if s.Parent != nil {
+			dirs[i-1] = s.Dir
+		}
+		i--
+	}
+	return string(dirs), ps
+}
+
 func UCS(board *Board, startPos Point) res {
 	pq := &PriorityQueue{}
 
 	visited := make(map[key]int)
 	dirs := []string{"U", "D", "L", "R"}
 
-	first := State{Pos: startPos, Path: "", TotalCost: 0, Steps: 0, CurrentTarget: 0}
+	first := &State{Pos: startPos, TotalCost: 0, CurrentTarget: 0}
 	pq.Push(&Item{state: first, priority: 0})
 
 	iter := 0
@@ -37,7 +56,8 @@ func UCS(board *Board, startPos Point) res {
 		iter++
 
 		if isGoal(cur, board) {
-			return res{true, cur.Path, cur.TotalCost, iter}
+			path, ps := reconstruct(cur)
+			return res{true, path, cur.TotalCost, iter, ps}
 		}
 
 		k := key{cur.Pos.X, cur.Pos.Y, cur.CurrentTarget}
@@ -61,7 +81,7 @@ func UCS(board *Board, startPos Point) res {
 		}
 	}
 
-	return res{false, "", 0, iter}
+	return res{false, "", 0, iter, nil}
 }
 
 func GBFS(board *Board, startPos Point, h func(Point, *Board, int) int) res {
@@ -70,7 +90,7 @@ func GBFS(board *Board, startPos Point, h func(Point, *Board, int) int) res {
 	visited := make(map[key]bool)
 	dirs := []string{"U", "D", "L", "R"}
 
-	first := State{Pos: startPos, Path: "", TotalCost: 0, Steps: 0, CurrentTarget: 0}
+	first := &State{Pos: startPos, TotalCost: 0, CurrentTarget: 0}
 	pq.Push(&Item{state: first, priority: h(startPos, board, 0)})
 
 	iter := 0
@@ -80,7 +100,8 @@ func GBFS(board *Board, startPos Point, h func(Point, *Board, int) int) res {
 		iter++
 
 		if isGoal(cur, board) {
-			return res{true, cur.Path, cur.TotalCost, iter}
+			path, ps := reconstruct(cur)
+			return res{true, path, cur.TotalCost, iter, ps}
 		}
 
 		k := key{cur.Pos.X, cur.Pos.Y, cur.CurrentTarget}
@@ -102,7 +123,7 @@ func GBFS(board *Board, startPos Point, h func(Point, *Board, int) int) res {
 		}
 	}
 
-	return res{false, "", 0, iter}
+	return res{false, "", 0, iter, nil}
 }
 
 func AStar(board *Board, startPos Point, h func(Point, *Board, int) int) res {
@@ -111,7 +132,7 @@ func AStar(board *Board, startPos Point, h func(Point, *Board, int) int) res {
 	visited := make(map[key]int)
 	dirs := []string{"U", "D", "L", "R"}
 
-	first := State{Pos: startPos, Path: "", TotalCost: 0, Steps: 0, CurrentTarget: 0}
+	first := &State{Pos: startPos, TotalCost: 0, CurrentTarget: 0}
 	pq.Push(&Item{state: first, priority: h(startPos, board, 0)})
 
 	iter := 0
@@ -121,7 +142,8 @@ func AStar(board *Board, startPos Point, h func(Point, *Board, int) int) res {
 		iter++
 
 		if isGoal(cur, board) {
-			return res{true, cur.Path, cur.TotalCost, iter}
+			path, ps := reconstruct(cur)
+			return res{true, path, cur.TotalCost, iter, ps}
 		}
 
 		k := key{cur.Pos.X, cur.Pos.Y, cur.CurrentTarget}
@@ -147,5 +169,5 @@ func AStar(board *Board, startPos Point, h func(Point, *Board, int) int) res {
 		}
 	}
 
-	return res{false, "", 0, iter}
+	return res{false, "", 0, iter, nil}
 }

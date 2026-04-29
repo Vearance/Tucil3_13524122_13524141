@@ -13,15 +13,15 @@ type Board struct {
 
 type State struct {
 	Pos           Point
-	Path          string
 	TotalCost     int
-	Steps         int
 	CurrentTarget int  // untuk urutan angka 0-9
+	Parent        *State
+	Dir           byte
 }
 
 // used in priority queue
 type Item struct {
-	state    State
+	state    *State
 	priority int
 	index    int
 }
