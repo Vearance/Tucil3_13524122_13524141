@@ -27,10 +27,11 @@ func main() {
 	}
 
 	var hFunc func(Point, *Board, int) int
-	if heuristic == "H1" {
-		hFunc = ManhattanDistance
-	} else if heuristic == "H2" {
-		hFunc = EuclideanDistance
+	switch heuristic {
+		case "H1":
+			hFunc = ManhattanDistance
+		case "H2":
+			hFunc = EuclideanDistance
 	}
 
 	start := time.Now()

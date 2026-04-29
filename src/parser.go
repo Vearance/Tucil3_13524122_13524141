@@ -21,10 +21,11 @@ func LoadMap(filename string) (*Board, Point, error) {
 	m, _ := strconv.Atoi(dims[1])
 
 	board := &Board{
-		N:     n,
-		M:     m,
-		Grid:  make([][]rune, n),
+		N: n,
+		M: m,
+		Grid: make([][]rune, n),
 		Costs: make([][]int, n),
+		MaxTarget: -1,
 	}
 
 	var startPos Point

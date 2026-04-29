@@ -5,9 +5,9 @@ type Point struct {
 }
 
 type Board struct {
-	N, M   int
-	Grid   [][]rune
-	Costs  [][]int
+	N, M  int
+	Grid  [][]rune
+	Costs [][]int
 	MaxTarget int
 }
 
