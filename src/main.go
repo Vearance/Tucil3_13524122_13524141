@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"path/filepath"
 	"time"
 )
 
@@ -9,6 +10,7 @@ func main() {
 	var filename string
 	fmt.Print("Masukan file input : ")
 	fmt.Scanln(&filename)
+	filename = filepath.Join("test", filepath.Base(filename))
 
 	var algo string
 	fmt.Print("Algoritma apa yang anda pilih? (UCS/GBFS/A*) ")
@@ -36,21 +38,22 @@ func main() {
 
 	start := time.Now()
 	var r res
-	if algo == "UCS" {
+	switch algo {
+	case "UCS":
 		r = UCS(board, startPos)
-	} else if algo == "GBFS" {
+	case "GBFS":
 		if hFunc == nil {
 			fmt.Println("Heuristik tidak valid")
 			return
 		}
 		r = GBFS(board, startPos, hFunc)
-	} else if algo == "A*" {
+	case "A*":
 		if hFunc == nil {
 			fmt.Println("Heuristik tidak valid")
 			return
 		}
 		r = AStar(board, startPos, hFunc)
-	} else {
+	default:
 		fmt.Println("Algoritma tidak valid")
 		return
 	}
