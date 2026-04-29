@@ -17,3 +17,10 @@ type State struct {
 	Steps         int
 	CurrentTarget int  // untuk urutan angka 0-9
 }
+
+// used in priority queue
+type Item struct {
+	state    State
+	priority int
+	index    int
+}
