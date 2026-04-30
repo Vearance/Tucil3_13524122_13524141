@@ -23,32 +23,32 @@ func drawBoard(board *Board, startPos, at Point) string {
 	return sb.String()
 }
 
-func printSolution(board *Board, startPos Point, r res) {
-	fmt.Printf("Solusi Yang Ditemukan : %s Cost dari Solusi : %d\n\n", r.Path, r.Cost)
+func printSolution(board *Board, startPos Point, path string, pos []Point, cost int) {
+	fmt.Printf("Solusi Yang Ditemukan : %s Cost dari Solusi : %d\n\n", path, cost)
 	fmt.Println("Initial")
-	fmt.Print(drawBoard(board, startPos, r.Positions[0]))
-	for i := 1; i < len(r.Positions); i++ {
+	fmt.Print(drawBoard(board, startPos, pos[0]))
+	for i := 1; i < len(pos); i++ {
 		fmt.Println()
-		fmt.Printf("Step %d : %c\n", i, r.Path[i-1])
-		fmt.Print(drawBoard(board, startPos, r.Positions[i]))
+		fmt.Printf("Step %d : %c\n", i, path[i-1])
+		fmt.Print(drawBoard(board, startPos, pos[i]))
 	}
 }
 
-func saveSolution(fname string, board *Board, startPos Point, r res, elapsed int64) error {
+func saveSolution(fname string, board *Board, startPos Point, path string, pos []Point, cost, iter int, elapsed int64) error {
 	f, err := os.Create(fname)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
-	fmt.Fprintf(f, "Solusi Yang Ditemukan : %s Cost dari Solusi : %d\n\n", r.Path, r.Cost)
+	fmt.Fprintf(f, "Solusi Yang Ditemukan : %s Cost dari Solusi : %d\n\n", path, cost)
 	fmt.Fprintln(f, "Initial")
-	fmt.Fprint(f, drawBoard(board, startPos, r.Positions[0]))
-	for i := 1; i < len(r.Positions); i++ {
+	fmt.Fprint(f, drawBoard(board, startPos, pos[0]))
+	for i := 1; i < len(pos); i++ {
 		fmt.Fprintln(f)
-		fmt.Fprintf(f, "Step %d : %c\n", i, r.Path[i-1])
-		fmt.Fprint(f, drawBoard(board, startPos, r.Positions[i]))
+		fmt.Fprintf(f, "Step %d : %c\n", i, path[i-1])
+		fmt.Fprint(f, drawBoard(board, startPos, pos[i]))
 	}
 	fmt.Fprintf(f, "\nWaktu eksekusi: %d ms\n", elapsed)
-	fmt.Fprintf(f, "Banyak iterasi yang dilakukan: %d iterasi\n", r.Iter)
+	fmt.Fprintf(f, "Banyak iterasi yang dilakukan: %d iterasi\n", iter)
 	return nil
 }

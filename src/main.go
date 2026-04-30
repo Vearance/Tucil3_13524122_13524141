@@ -13,6 +13,12 @@ func main() {
 	fmt.Scanln(&filename)
 	filename = filepath.Join("test", filepath.Base(filename))
 
+	board, startPos, err := LoadMap(filename)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
 	var algo string
 	fmt.Print("Algoritma apa yang anda pilih? (UCS/GBFS/A*) ")
 	fmt.Scanln(&algo)
@@ -25,11 +31,6 @@ func main() {
 		heuristic = strings.ToUpper(heuristic)
 	}
 
-	board, startPos, err := LoadMap(filename)
-	if err != nil {
-		fmt.Println("Error:", err)
-		return
-	}
 
 	var hFunc func(Point, *Board, int) int
 	switch heuristic {
@@ -40,39 +41,43 @@ func main() {
 	}
 
 	start := time.Now()
-	var r res
+	var goal *State
+	var iter int
 	switch algo {
 	case "UCS":
-		r = UCS(board, startPos)
+		goal, iter = UCS(board, startPos)
 	case "GBFS":
 		if hFunc == nil {
 			fmt.Println("Heuristik tidak valid")
 			return
 		}
-		r = GBFS(board, startPos, hFunc)
+		goal, iter = GBFS(board, startPos, hFunc)
 	case "A*":
 		if hFunc == nil {
 			fmt.Println("Heuristik tidak valid")
 			return
 		}
-		r = AStar(board, startPos, hFunc)
+		goal, iter = AStar(board, startPos, hFunc)
 	default:
 		fmt.Println("Algoritma tidak valid")
 		return
 	}
-	elapsed := time.Since(start)
+	dT := time.Since(start)
 
-	if !r.Found {
+	if goal == nil {
 		fmt.Println("Solusi tidak ditemukan")
-		fmt.Printf(">> Waktu eksekusi: %d ms\n", elapsed.Milliseconds())
-		fmt.Printf(">> Banyak iterasi yang dilakukan: %d iterasi\n", r.Iter)
+		fmt.Printf(">> Waktu eksekusi: %d ms\n", dT.Milliseconds())
+		fmt.Printf(">> Banyak iterasi yang dilakukan: %d iterasi\n", iter)
 		return
 	}
 
-	printSolution(board, startPos, r)
+	path, pos := reverse(goal)
+	cost := goal.TotalCost
 
-	fmt.Printf("\n>> Waktu eksekusi: %d ms\n", elapsed.Milliseconds())
-	fmt.Printf(">> Banyak iterasi yang dilakukan: %d iterasi\n", r.Iter)
+	printSolution(board, startPos, path, pos, cost)
+
+	fmt.Printf("\n>> Waktu eksekusi: %d ms\n", dT.Milliseconds())
+	fmt.Printf(">> Banyak iterasi yang dilakukan: %d iterasi\n", iter)
 
 	var pb string
 	fmt.Print(">> Apakah Anda ingin melakukan playback? (Ya/Tidak) : ")
@@ -85,9 +90,9 @@ func main() {
 			if step == 0 {
 				fmt.Println("Initial")
 			} else {
-				fmt.Printf("Step %d : %c\n", step, r.Path[step-1])
+				fmt.Printf("Step %d : %c\n", step, path[step-1])
 			}
-			fmt.Print(drawBoard(board, startPos, r.Positions[step]))
+			fmt.Print(drawBoard(board, startPos, pos[step]))
 			fmt.Print("[A=prev D=next J=jump Q=quit]: ")
 			var cmd string
 			fmt.Scanln(&cmd)
@@ -97,14 +102,14 @@ func main() {
 					step--
 				}
 			case "D", "d":
-				if step < len(r.Positions)-1 {
+				if step < len(pos)-1 {
 					step++
 				}
 			case "J", "j":
 				fmt.Print("Step: ")
 				var n int
 				fmt.Scanln(&n)
-				if n >= 0 && n < len(r.Positions) {
+				if n >= 0 && n < len(pos) {
 					step = n
 				}
 			case "Q", "q":
@@ -123,7 +128,7 @@ func main() {
 		if fn == "" {
 			fn = "solusi.txt"
 		}
-		if errSv := saveSolution(fn, board, startPos, r, elapsed.Milliseconds()); errSv != nil {
+		if errSv := saveSolution(fn, board, startPos, path, pos, cost, iter, dT.Milliseconds()); errSv != nil {
 			fmt.Println("Gagal menyimpan:", errSv)
 		} else {
 			abs, _ := filepath.Abs(fn)

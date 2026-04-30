@@ -1,16 +1,5 @@
 package main
 
-type res struct {
-	Found     bool
-	Path      string
-	Cost      int
-	Iter      int
-	Positions []Point
-}
-
-type key struct {
-	X, Y, T int
-}
 
 func isGoal(s *State, b *Board) bool {
 	if b.Grid[s.Pos.X][s.Pos.Y] != 'O' {
@@ -22,7 +11,7 @@ func isGoal(s *State, b *Board) bool {
 	return s.CurrentTarget > b.MaxTarget
 }
 
-func reconstruct(goal *State) (string, []Point) {
+func reverse(goal *State) (string, []Point) {
 	n := 0
 	for s := goal; s != nil; s = s.Parent {
 		n++
@@ -40,7 +29,7 @@ func reconstruct(goal *State) (string, []Point) {
 	return string(dirs), ps
 }
 
-func UCS(board *Board, startPos Point) res {
+func UCS(board *Board, startPos Point) (*State, int) {
 	pq := &PriorityQueue{}
 
 	visited := make(map[key]int)
@@ -56,8 +45,7 @@ func UCS(board *Board, startPos Point) res {
 		iter++
 
 		if isGoal(cur, board) {
-			path, ps := reconstruct(cur)
-			return res{true, path, cur.TotalCost, iter, ps}
+			return cur, iter
 		}
 
 		k := key{cur.Pos.X, cur.Pos.Y, cur.CurrentTarget}
@@ -81,10 +69,10 @@ func UCS(board *Board, startPos Point) res {
 		}
 	}
 
-	return res{false, "", 0, iter, nil}
+	return nil, iter
 }
 
-func GBFS(board *Board, startPos Point, h func(Point, *Board, int) int) res {
+func GBFS(board *Board, startPos Point, h func(Point, *Board, int) int) (*State, int) {
 	pq := &PriorityQueue{}
 
 	visited := make(map[key]bool)
@@ -100,8 +88,7 @@ func GBFS(board *Board, startPos Point, h func(Point, *Board, int) int) res {
 		iter++
 
 		if isGoal(cur, board) {
-			path, ps := reconstruct(cur)
-			return res{true, path, cur.TotalCost, iter, ps}
+			return cur, iter
 		}
 
 		k := key{cur.Pos.X, cur.Pos.Y, cur.CurrentTarget}
@@ -123,10 +110,10 @@ func GBFS(board *Board, startPos Point, h func(Point, *Board, int) int) res {
 		}
 	}
 
-	return res{false, "", 0, iter, nil}
+	return nil, iter
 }
 
-func AStar(board *Board, startPos Point, h func(Point, *Board, int) int) res {
+func AStar(board *Board, startPos Point, h func(Point, *Board, int) int) (*State, int) {
 	pq := &PriorityQueue{}
 
 	visited := make(map[key]int)
@@ -142,8 +129,7 @@ func AStar(board *Board, startPos Point, h func(Point, *Board, int) int) res {
 		iter++
 
 		if isGoal(cur, board) {
-			path, ps := reconstruct(cur)
-			return res{true, path, cur.TotalCost, iter, ps}
+			return cur, iter
 		}
 
 		k := key{cur.Pos.X, cur.Pos.Y, cur.CurrentTarget}
@@ -169,5 +155,5 @@ func AStar(board *Board, startPos Point, h func(Point, *Board, int) int) res {
 		}
 	}
 
-	return res{false, "", 0, iter, nil}
+	return nil, iter
 }

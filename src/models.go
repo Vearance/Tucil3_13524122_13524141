@@ -25,3 +25,7 @@ type Item struct {
 	priority int
 	index    int
 }
+
+type key struct {
+	X, Y, T int
+}
