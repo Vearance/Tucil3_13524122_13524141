@@ -24,7 +24,8 @@ func drawBoard(board *Board, startPos, at Point) string {
 }
 
 func printSolution(board *Board, startPos Point, path string, pos []Point, cost int) {
-	fmt.Printf("Solusi Yang Ditemukan : %s Cost dari Solusi : %d\n\n", path, cost)
+	fmt.Printf("Solusi Yang Ditemukan : %s\n", path)
+	fmt.Printf("Cost dari Solusi : %d\n\n", cost)
 	fmt.Println("Initial")
 	fmt.Print(drawBoard(board, startPos, pos[0]))
 	for i := 1; i < len(pos); i++ {
