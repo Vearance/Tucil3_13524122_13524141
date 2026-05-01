@@ -70,9 +70,10 @@ func main() {
 
 	heuristic := ""
 	if algo != "UCS" {
-		heuristic = choice(reader, "Heuristic apa yang anda pilih? (H1/H2) ", map[string]bool{
+		heuristic = choice(reader, "Heuristic apa yang anda pilih? (H1/H2/H3) ", map[string]bool{
 			"H1": true,
 			"H2": true,
+			"H3": true,
 		})
 	}
 
@@ -82,6 +83,8 @@ func main() {
 			hFunc = ManhattanDistance
 		case "H2":
 			hFunc = EuclideanDistance
+		case "H3":
+			hFunc = ChebyshevDistance
 	}
 
 	start := time.Now()
