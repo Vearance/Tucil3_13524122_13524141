@@ -142,10 +142,14 @@ func main() {
 			case "A":
 				if step > 0 {
 					step--
+				} else {
+					fmt.Println(">> Posisi utama")
 				}
 			case "D":
 				if step < len(pos)-1 {
 					step++
+				} else {
+					fmt.Println(">> Posisi akhir")
 				}
 			case "J":
 				fmt.Print("Step: ")
