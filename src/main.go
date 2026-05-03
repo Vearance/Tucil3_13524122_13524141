@@ -62,14 +62,15 @@ func main() {
 		break
 	}
 
-	algo := choice(reader, "Algoritma apa yang anda pilih? (UCS/GBFS/A*) ", map[string]bool{
+	algo := choice(reader, "Algoritma apa yang anda pilih? (UCS/BFS/GBFS/A*) ", map[string]bool{
 		"UCS":  true,
+		"BFS":  true,
 		"GBFS": true,
 		"A*":   true,
 	})
 
 	heuristic := ""
-	if algo != "UCS" {
+	if algo != "UCS" && algo != "BFS" {
 		heuristic = choice(reader, "Heuristic apa yang anda pilih? (H1/H2/H3) ", map[string]bool{
 			"H1": true,
 			"H2": true,
@@ -93,6 +94,8 @@ func main() {
 	switch algo {
 	case "UCS":
 		goal, iter = UCS(board, startPos)
+	case "BFS":
+		goal, iter = BFS(board, startPos)
 	case "GBFS":
 		goal, iter = GBFS(board, startPos, hFunc)
 	case "A*":

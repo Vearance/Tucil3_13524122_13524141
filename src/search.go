@@ -157,3 +157,38 @@ func AStar(board *Board, startPos Point, h func(Point, *Board, int) int) (*State
 
 	return nil, iter
 }
+
+func BFS(board *Board, startPos Point) (*State, int) {
+	visited := make(map[key]bool)
+	dirs := []string{"U", "D", "L", "R"}
+
+	first := &State{Pos: startPos, TotalCost: 0, CurrentTarget: 0}
+	queue := []*State{first}
+	visited[key{startPos.X, startPos.Y, 0}] = true
+
+	iter := 0
+	for len(queue) > 0 {
+		cur := queue[0]
+		queue = queue[1:]
+		iter++
+
+		if isGoal(cur, board) {
+			return cur, iter
+		}
+
+		for i := 0; i < len(dirs); i++ {
+			next, ok := Move(board, cur, dirs[i])
+			if !ok {
+				continue
+			}
+			k := key{next.Pos.X, next.Pos.Y, next.CurrentTarget}
+			if visited[k] {
+				continue
+			}
+			visited[k] = true
+			queue = append(queue, next)
+		}
+	}
+
+	return nil, iter
+}
