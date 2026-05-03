@@ -1,5 +1,6 @@
-package main
+package solver
 
+import "math"
 
 func isGoal(s *State, b *Board) bool {
 	if b.Grid[s.Pos.X][s.Pos.Y] != 'O' {
@@ -11,7 +12,7 @@ func isGoal(s *State, b *Board) bool {
 	return s.CurrentTarget > b.MaxTarget
 }
 
-func reverse(goal *State) (string, []Point) {
+func Reverse(goal *State) (string, []Point) {
 	n := 0
 	for s := goal; s != nil; s = s.Parent {
 		n++
@@ -191,4 +192,62 @@ func BFS(board *Board, startPos Point) (*State, int) {
 	}
 
 	return nil, iter
+}
+
+func IDAStar(board *Board, startPos Point, h func(Point, *Board, int) int) (*State, int) {
+	first := &State{Pos: startPos, TotalCost: 0, CurrentTarget: 0}
+	iter := 0
+	threshold := h(startPos, board, 0)
+
+	for {
+		nextLimit, goal := idaSearch(board, first, threshold, h, &iter)
+		if goal != nil {
+			return goal, iter
+		}
+		if nextLimit == math.MaxInt {
+			return nil, iter
+		}
+		threshold = nextLimit
+	}
+}
+
+func idaSearch(board *Board, cur *State, threshold int, h func(Point, *Board, int) int, iter *int) (int, *State) {
+	*iter++
+	hv := h(cur.Pos, board, cur.CurrentTarget)
+	f := cur.TotalCost + hv
+	if f > threshold {
+		return f, nil
+	}
+	if isGoal(cur, board) {
+		return f, cur
+	}
+
+	min := math.MaxInt
+	dirs := []string{"U", "D", "L", "R"}
+	for i := 0; i < len(dirs); i++ {
+		next, ok := Move(board, cur, dirs[i])
+		if !ok {
+			continue
+		}
+		if isOnPath(cur, next.Pos, next.CurrentTarget) {
+			continue
+		}
+		nextLimit, goal := idaSearch(board, next, threshold, h, iter)
+		if goal != nil {
+			return nextLimit, goal
+		}
+		if nextLimit < min {
+			min = nextLimit
+		}
+	}
+	return min, nil
+}
+
+func isOnPath(s *State, pos Point, target int) bool {
+	for c := s; c != nil; c = c.Parent {
+		if c.Pos == pos && c.CurrentTarget == target {
+			return true
+		}
+	}
+	return false
 }
