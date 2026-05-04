@@ -30,9 +30,9 @@ source ~/.bashrc
 wails build
 
 # Run
-./build/bin/solver  # Linux
-./build/bin/solver.exe # Windows
-./build/bin/solver.app  # Mac
+./build/bin/solver           # Linux
+./build/bin/solver.exe       # Windows
+open ./build/bin/Solver.app  # macOS
 
 # Or dev mode (hot-reload)
 wails dev
