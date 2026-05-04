@@ -364,7 +364,7 @@ td {
   background-image: url("./sprites/floor.png");
   background-size: 100% 100%;
   background-repeat: no-repeat;
-  border: 2px solid #000;
+  border: none;
   image-rendering: pixelated;
   box-sizing: border-box;
 }
@@ -372,7 +372,10 @@ td {
 td.empty { color: transparent; }
 td.start { color: transparent; }
 
-td.num { color: #1a0e05; }
+td.num {
+  color: #1a0e05;
+  border: 1px solid #00000026;
+}
 
 td.wall {
   color: transparent;
