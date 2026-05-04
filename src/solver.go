@@ -1,4 +1,4 @@
-package main
+package solver
 
 func Move(board *Board, current *State, dir string) (*State, bool) {
 	dx, dy := 0, 0

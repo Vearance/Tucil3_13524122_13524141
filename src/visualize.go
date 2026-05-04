@@ -1,4 +1,4 @@
-package main
+package solver
 
 import (
 	"fmt"
@@ -23,19 +23,7 @@ func drawBoard(board *Board, startPos, at Point) string {
 	return sb.String()
 }
 
-func printSolution(board *Board, startPos Point, path string, pos []Point, cost int) {
-	fmt.Printf("Solusi Yang Ditemukan : %s\n", path)
-	fmt.Printf("Cost dari Solusi : %d\n\n", cost)
-	fmt.Println("Initial")
-	fmt.Print(drawBoard(board, startPos, pos[0]))
-	for i := 1; i < len(pos); i++ {
-		fmt.Println()
-		fmt.Printf("Step %d : %c\n", i, path[i-1])
-		fmt.Print(drawBoard(board, startPos, pos[i]))
-	}
-}
-
-func saveSolution(fname string, board *Board, startPos Point, path string, pos []Point, cost, iter int, elapsed int64) error {
+func SaveSolution(fname string, board *Board, startPos Point, path string, pos []Point, cost, iter int, elapsed int64) error {
 	f, err := os.Create(fname)
 	if err != nil {
 		return err
