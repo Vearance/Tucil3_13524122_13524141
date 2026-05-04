@@ -71,6 +71,14 @@ function setStepLabel() {
     : `Step ${step} / ${positions.length - 1}`;
 }
 
+function updateHeurVisibility() {
+  const algo = $('algo').value;
+  const needsHeur = algo === 'GBFS' || algo === 'A*' || algo === 'IDA*';
+  $('heur-field').style.display = needsHeur ? '' : 'none';
+}
+$('algo').onchange = updateHeurVisibility;
+updateHeurVisibility();
+
 $('browse').onclick = async () => {
   const picked = await App().PickFile();
   if (picked) $('file').value = picked;
@@ -100,6 +108,7 @@ $('load').onclick = async () => {
   setStats({});
   setStepLabel();
   showBoard();
+  $('nopath').hidden = true;
   render();
 };
 
@@ -107,21 +116,23 @@ $('solve').onclick = async () => {
   if (!board) { alert('Load a map first'); return; }
   const r = await App().Solve($('algo').value, heurValue());
   if (r.error) { alert(r.error); return; }
+  const timeStr = `${r.elapsedMs.toFixed(3)} ms`;
   if (!r.found) {
-    setStats({iter: r.iter, time: `${r.elapsedMs} ms`});
+    setStats({iter: r.iter, time: timeStr});
     positions = [];
     setStepLabel();
     render();
-    alert('No solution found');
+    $('nopath').hidden = false;
     return;
   }
+  $('nopath').hidden = true;
   positions = r.positions;
   step = 0;
   setStats({
     path: r.path,
     cost: r.cost,
     iter: r.iter,
-    time: `${r.elapsedMs} ms`,
+    time: timeStr,
   });
   setStepLabel();
   render();

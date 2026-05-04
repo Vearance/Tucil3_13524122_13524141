@@ -5,7 +5,7 @@
   <title>Solver</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Pixelify+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=VT323&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
@@ -37,7 +37,7 @@
             <option>IDA*</option>
           </select>
         </div>
-        <div class="field">
+        <div class="field" id="heur-field">
           <label for="heur">Heuristic</label>
           <select id="heur">
             <option selected>H1 — Manhattan</option>
@@ -88,6 +88,7 @@
 
     <section class="canvas">
       <table id="board" hidden></table>
+      <div id="nopath" class="banner" hidden>No path found</div>
     </section>
   </main>
 </div>

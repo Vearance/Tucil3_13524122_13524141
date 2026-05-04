@@ -19,7 +19,8 @@ type App struct {
 	pos       []solver.Point
 	cost      int
 	iter      int
-	elapsedMs int64
+	elapsedMs float64
+	solved    bool
 }
 
 type LoadResult struct {
@@ -36,7 +37,7 @@ type SolveResult struct {
 	Path      string   `json:"path"`
 	Cost      int      `json:"cost"`
 	Iter      int      `json:"iter"`
-	ElapsedMs int64    `json:"elapsedMs"`
+	ElapsedMs float64  `json:"elapsedMs"`
 	Positions [][2]int `json:"positions"`
 	Error     string   `json:"error"`
 }
@@ -74,6 +75,10 @@ func (a *App) LoadFile(path string) LoadResult {
 	a.startPos = startPos
 	a.path = ""
 	a.pos = nil
+	a.cost = 0
+	a.iter = 0
+	a.elapsedMs = 0
+	a.solved = false
 
 	rows := make([]string, board.N)
 	for i := 0; i < board.N; i++ {
@@ -129,11 +134,14 @@ func (a *App) Solve(algo string, heuristic string) SolveResult {
 	default:
 		return SolveResult{Error: "Algoritma tidak dikenal"}
 	}
-	a.elapsedMs = time.Since(t0).Milliseconds()
+	a.elapsedMs = float64(time.Since(t0).Microseconds()) / 1000.0
 	a.iter = iter
 
 	if goal == nil {
 		a.pos = nil
+		a.path = ""
+		a.cost = 0
+		a.solved = true
 		return SolveResult{
 			Found:     false,
 			Iter:      iter,
@@ -143,6 +151,7 @@ func (a *App) Solve(algo string, heuristic string) SolveResult {
 
 	a.path, a.pos = solver.Reverse(goal)
 	a.cost = goal.TotalCost
+	a.solved = true
 
 	positions := make([][2]int, len(a.pos))
 	for i, p := range a.pos {
@@ -160,8 +169,8 @@ func (a *App) Solve(algo string, heuristic string) SolveResult {
 }
 
 func (a *App) Save(defaultName string) string {
-	if a.pos == nil {
-		return "Belum ada solusi"
+	if !a.solved {
+		return "Belum ada hasil pencarian"
 	}
 	if defaultName == "" {
 		defaultName = "solusi.txt"
