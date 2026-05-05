@@ -1,6 +1,8 @@
 let board = null;
 let positions = [];
 let step = 0;
+let playTimer = null;
+let playDir = 0;
 
 const $ = id => document.getElementById(id);
 
@@ -99,9 +101,45 @@ function heurValue() {
   return $('heur').value.split(' ')[0];
 }
 
+function stopPlay() {
+  if (playTimer !== null) {
+    clearInterval(playTimer);
+    playTimer = null;
+  }
+  playDir = 0;
+}
+
+function startPlay(dir) {
+  stopPlay();
+  if (positions.length === 0) return;
+  if (dir > 0 && step >= positions.length - 1) return;
+  if (dir < 0 && step <= 0) return;
+  playDir = dir;
+  const sps = parseFloat($('speed').value);
+  const interval = 1000 / sps;
+  playTimer = setInterval(() => {
+    const atEnd = playDir > 0 && step >= positions.length - 1;
+    const atStart = playDir < 0 && step <= 0;
+    if (atEnd || atStart) { stopPlay(); return; }
+    step += playDir;
+    setStepLabel();
+    render();
+  }, interval);
+}
+
+$('speed').oninput = () => {
+  $('speed-val').textContent = parseFloat($('speed').value).toFixed(1);
+  if (playDir !== 0) startPlay(playDir);
+};
+
+$('play-fwd').onclick = () => startPlay(1);
+$('play-rev').onclick = () => startPlay(-1);
+$('pause').onclick = () => stopPlay();
+
 $('load').onclick = async () => {
   const r = await App().LoadFile($('file').value);
   if (r.error) { alert(r.error); return; }
+  stopPlay();
   board = r;
   positions = [];
   step = 0;
@@ -114,6 +152,7 @@ $('load').onclick = async () => {
 
 $('solve').onclick = async () => {
   if (!board) { alert('Load a map first'); return; }
+  stopPlay();
   const r = await App().Solve($('algo').value, heurValue());
   if (r.error) { alert(r.error); return; }
   const timeStr = `${r.elapsedMs.toFixed(3)} ms`;
@@ -140,6 +179,7 @@ $('solve').onclick = async () => {
 
 $('prev').onclick = () => {
   if (positions.length === 0 || step === 0) return;
+  stopPlay();
   step--;
   setStepLabel();
   render();
@@ -147,6 +187,7 @@ $('prev').onclick = () => {
 
 $('next').onclick = () => {
   if (positions.length === 0 || step >= positions.length - 1) return;
+  stopPlay();
   step++;
   setStepLabel();
   render();
@@ -154,6 +195,7 @@ $('next').onclick = () => {
 
 $('jump').onclick = () => {
   if (positions.length === 0) return;
+  stopPlay();
   const n = parseInt($('jumpval').value, 10);
   if (isNaN(n) || n < 0 || n >= positions.length) {
     alert('Step di luar rentang');
