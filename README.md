@@ -44,7 +44,9 @@ wails dev
 2. Choose algorithm (`UCS`/`BFS`/`GBFS`/`A*`/`IDA*`) & heuristic (`H1` Manhattan/`H2` Euclidean/`H3` Chebyshev)
 3. Click **Solve** → see path, cost, iterations, elapsed time
 4. Use **< Prev**, **Next >**, or **Jump** to replay solution steps
-5. Click **Save** to save result to `test/output/<name>.txt`
+5. Use **< Play**, **Play >** to play in reverse or forward
+6. Adjust the slider to modify play speed
+7. Click **Save** to save result to `test/output/<name>.txt`
 
 ## Map File Format
 
