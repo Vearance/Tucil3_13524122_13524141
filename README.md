@@ -40,7 +40,7 @@ wails dev
 
 ## Usage
 
-1. Click **Browse...** → select a map file (e.g., `test/input.txt`) → **Load**
+1. Click **Browse...** → select a map file (e.g., `test/input.txt`) → **Load** to confirm map.
 2. Choose algorithm (`UCS`/`BFS`/`GBFS`/`A*`/`IDA*`) & heuristic (`H1` Manhattan/`H2` Euclidean/`H3` Chebyshev)
 3. Click **Solve** → see path, cost, iterations, elapsed time
 4. Use **< Prev**, **Next >**, or **Jump** to replay solution steps
